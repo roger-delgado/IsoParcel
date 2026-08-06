@@ -1,0 +1,31 @@
+[general]
+name=IsoParcel
+qgisMinimumVersion=3.22
+description=Equitable polygon subdivision into configurable row*column grids with automatic topological cleaning.
+version=1.0.0
+author=Roger Delgado Alcívar
+email=roger95delgado@gmail.com
+
+about=IsoParcel partitions input polygon layers into equal-area parcels using an adaptive orthogonal cutting algorithm with binary search convergence. It automatically repairs self-intersections, handles multipart geometries safely, and guarantees area equity (CV <0.01%) for cadastral, agricultural, and experimental design workflows. Integrated into QGIS Processing Toolbox for batch and model workflows. Concept initiated 2026-05-15.
+
+tracker=https://github.com/roger-delgado/IsoParcel/issues
+repository=https://github.com/roger-delgado/IsoParcel
+homepage=https://github.com/roger-delgado/IsoParcel
+
+hasProcessingProvider=yes
+
+changelog=
+    1.0.0 (2026-08-05)
+        - Initial release
+        - Adaptive binary-search cutting algorithm
+        - Automatic topology repair (makeValid/buffer0)
+        - Processing Toolbox integration
+        - Concept initiated 2026-05-15
+
+tags=subdivision,parcel,equal-area,processing,agriculture,cadastre
+
+category=Vector
+icon=icon.png
+experimental=False
+deprecated=False
+server=False
