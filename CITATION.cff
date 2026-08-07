@@ -1,7 +1,9 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
+
 title: "IsoParcel: Equal-area polygon partitioning plugin for QGIS"
-abstract: "QGIS plugin for mathematically equal-area partitioning of irregular polygons in cadastral and agricultural applications. Guarantees σ < 0.01% area deviation via adaptive binary-search algorithm."
+abstract: "QGIS plugin for mathematically equal-area partitioning of irregular polygons in cadastral and agricultural applications. Guarantees σ < 0.01% area deviation via adaptive binary-search algorithm with automatic topological cleaning."
+
 authors:
   - family-names: "Delgado-Alcívar"
     given-names: "Roger"
@@ -11,10 +13,14 @@ authors:
     orcid: "https://orcid.org/0000-0001-5152-9973"
     affiliation: "Universidad Técnica de Manabí, Ecuador"
     country: "EC"
+
 version: 1.0.1
-doi: "10.5281/zenodo.20225170"
+doi: "10.5281/zenodo.20225393"
 date-released: 2026-05-16
-url: "https://github.com/roger-delgado/IsoParcel/tree/v1.0.0"
+
+url: "https://github.com/roger-delgado/IsoParcel/tree/v1.0.1"
+repository-code: "https://github.com/roger-delgado/IsoParcel"
+
 keywords:
   - "QGIS"
   - "cadastral partitioning"
@@ -22,5 +28,7 @@ keywords:
   - "agricultural trials"
   - "open-source"
   - "GeoAI"
-license: MIT
-repository-code: "https://github.com/roger-delgado/IsoParcel"
+  - "precision agriculture"
+  - "topological cleaning"
+
+license: GPL-2.0-or-later
