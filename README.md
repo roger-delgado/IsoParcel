@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20225393.svg)](https://doi.org/10.5281/zenodo.20225393)
+
 # IsoParcel
 
 Equitable polygon subdivision into configurable row*column grids with automatic topological cleaning.
