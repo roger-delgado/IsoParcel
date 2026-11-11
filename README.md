@@ -1,24 +1,25 @@
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20225393.svg)](https://doi.org/10.5281/zenodo.20225393)
-
 # IsoParcel
 
 Equitable polygon subdivision into configurable row*column grids with automatic topological cleaning.
 
 ## Description
-IsoParcel partitions input polygon layers into equal-area parcels using an adaptive orthogonal cutting algorithm with binary search convergence. It automatically repairs self-intersections, handles multipart geometries safely, and guarantees area equity (CV <0.01%) for cadastral, agricultural, and experimental design workflows.
+IsoParcel partitions input polygon layers into equal-area parcels using an adaptive orthogonal cutting algorithm with binary search convergence. Invalid geometries are repaired before cutting, and successful subdivisions reach an area coefficient of variation (CV) below 0.01% for cadastral, agricultural, and experimental design workflows.
 
 **Concept initiated**: 2026-05-15
+
+## Tutorial
+Step-by-step guide with figures: [English](docs/TUTORIAL.md) · [Español](docs/TUTORIAL_es.md)
 
 ## Features
 - Subdivides polygons into N×M parcels with mathematically controlled area equity
 - Automatic repair of self-intersections and degenerate vertices (`makeValid` + `buffer(0)`)
-- Safe handling of MultiPolygon inputs (processes largest part)
+- MultiPolygon inputs: the largest part is subdivided and a warning reports the parts left out
+- Warning when a feature produces fewer parcels than requested, so it can be reviewed
 - Integrated into QGIS Processing Toolbox (supports batch processing and graphical models)
 - Configurable tolerance and iteration limits for precision control
 
 ## Requirements
-- QGIS 3.22 or later
-- Python 3.9+ (Shapely is bundled in QGIS ≥3.22)
+- QGIS 3.34 or later (it uses the Python interpreter and Shapely bundled with QGIS)
 - Works on Windows, Linux, macOS
 
 ## Usage
@@ -33,10 +34,17 @@ IsoParcel partitions input polygon layers into equal-area parcels using an adapt
    - `parcel_idx`: Index of parcel within subdivision (1-based)
 
 ## Restrictions
-- Optimized for simple polygons. Highly concave or multi-part geometries may require pre-cleaning with `v.clean` (GRASS) or similar.
+- Optimized for simple polygons. Highly concave or multi-part geometries may require pre-cleaning with `v.clean` (GRASS) or similar, or splitting with *Multipart to singleparts*.
 - Does not preserve topological relationships between adjacent polygons (processes each feature independently).
-- Tested primarily in projected CRS (UTM); geographic CRS may introduce minor area distortions due to planar approximation.
-- Area equity guarantee (CV <0.01%) applies only to successful executions; failures are logged as warnings.
+- Use a projected CRS with units in metres (e.g. UTM): the area tolerance is given in m², so layers in geographic coordinates should be reprojected first.
+- Area equity (CV <0.01%) applies only to successful executions; failures are logged as warnings.
+
+## Changelog
+- **1.0.2** (2026-11-11): fixed the orientation angle (the closing vertex of the ring is no longer used to find the base segment); warnings for multipart features and for fewer parcels than requested.
+- **1.0.0** (2026-08-05): initial release.
+
+## How to cite
+Delgado-Alcívar, R. A. (2026). IsoParcel: Equal-area polygon partitioning plugin for QGIS (Version v1.0.2) [Computer software]. Zenodo. https://doi.org/[DOI of v1.0.2]
 
 ## License
 GPL-2.0-or-later. See LICENSE file.
@@ -47,4 +55,5 @@ https://github.com/roger-delgado/IsoParcel
 
 ## Acknowledgements
 - QGIS community for the Processing framework and PyQGIS API
+- The validation benchmarks were run on the high-performance computing infrastructure of CEDIA (Corporación Ecuatoriana para el Desarrollo de la Investigación y la Academia)
 - Algorithm logic refined with AI-assisted code review (2026). Final validation and scientific responsibility remain with the author.

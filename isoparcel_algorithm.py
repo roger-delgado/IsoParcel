@@ -58,8 +58,10 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
     def shortHelpString(self):
         return self.tr(
             "Partitions input polygons into equal-area parcels using "
-            "configurable row*column grids. Includes automatic topological "
-            "repair and handles multipart geometries safely."
+            "configurable row*column grids. Invalid geometries are repaired "
+            "before cutting. For multipart features only the largest part is "
+            "subdivided; a warning is shown when other parts are left out or "
+            "when fewer parcels than requested are produced."
         )
 
     def initAlgorithm(self, config=None):
@@ -67,14 +69,14 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterVectorLayer(
                 self.INPUT,
                 self.tr('Input polygon layer'),
-                [QgsProcessing.TypeVectorPolygon]
+                [QgsProcessing.SourceType.TypeVectorPolygon]
             )
         )
         self.addParameter(
             QgsProcessingParameterNumber(
                 self.ROWS,
                 self.tr('Number of rows'),
-                QgsProcessingParameterNumber.Integer,
+                QgsProcessingParameterNumber.Type.Integer,
                 defaultValue=2,
                 minValue=1,
                 maxValue=50
@@ -84,7 +86,7 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 self.COLS,
                 self.tr('Number of columns'),
-                QgsProcessingParameterNumber.Integer,
+                QgsProcessingParameterNumber.Type.Integer,
                 defaultValue=2,
                 minValue=1,
                 maxValue=50
@@ -94,7 +96,7 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 self.TOLERANCE,
                 self.tr('Area tolerance (m²)'),
-                QgsProcessingParameterNumber.Double,
+                QgsProcessingParameterNumber.Type.Double,
                 defaultValue=0.01,
                 minValue=0.001,
                 maxValue=10.0
@@ -104,7 +106,7 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
             QgsProcessingParameterNumber(
                 self.MAX_ITER,
                 self.tr('Max iterations per cut'),
-                QgsProcessingParameterNumber.Integer,
+                QgsProcessingParameterNumber.Type.Integer,
                 defaultValue=25,
                 minValue=10,
                 maxValue=100
@@ -124,7 +126,7 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
         tolerance = self.parameterAsDouble(parameters, self.TOLERANCE, context)
         max_iter = self.parameterAsInt(parameters, self.MAX_ITER, context)
 
-        # Output keeps original attributes plus parent/index tracking fields.
+        # Output schema mirrors the source layer plus parent/index tracking fields.
         fields = QgsFields()
         for field in source.fields():
             fields.append(field)
@@ -136,7 +138,7 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
             self.OUTPUT,
             context,
             fields,
-            QgsWkbTypes.Polygon,
+            QgsWkbTypes.Type.Polygon,
             source.sourceCrs()
         )
 
@@ -147,9 +149,19 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 break
             try:
-                parcels = self._process_geometry(
+                parcels, parts_left_out = self._process_geometry(
                     feat.geometry(), rows, cols, tolerance, max_iter
                 )
+                if parts_left_out:
+                    feedback.pushWarning(
+                        f"IsoParcel: Feature {feat.id()} is multipart; only its largest "
+                        f"part was subdivided ({parts_left_out} other part(s) left out)."
+                    )
+                if len(parcels) != rows * cols:
+                    feedback.pushWarning(
+                        f"IsoParcel: Feature {feat.id()} produced {len(parcels)} parcels "
+                        f"instead of {rows * cols}; check the result for this feature."
+                    )
                 for idx, p_geom in enumerate(parcels):
                     out_feat = QgsFeature(fields)
                     out_feat.setGeometry(p_geom)
@@ -157,7 +169,7 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
                         out_feat.setAttribute(i, feat.attribute(i))
                     out_feat.setAttribute('parent_id', feat.id())
                     out_feat.setAttribute('parcel_idx', idx + 1)
-                    sink.addFeature(out_feat, QgsFeatureSink.FastInsert)
+                    sink.addFeature(out_feat, QgsFeatureSink.Flag.FastInsert)
             except Exception as e:
                 # Skip unrecoverable geometries without aborting the whole run.
                 feedback.pushWarning(f"IsoParcel: Feature {feat.id()} failed: {str(e)}")
@@ -176,12 +188,15 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
         return qgs_geom
 
     def _get_orientation_angle(self, qgs_geom: QgsGeometry) -> float:
-        # Align the longest/base edge to the x-axis so row/column cuts follow
-        # the polygon's natural orientation rather than the map grid.
+        # Align the base edge to the x-axis so row/column cuts follow the
+        # polygon's natural orientation rather than the map grid.
         if qgs_geom.isMultipart():
             parts = qgs_geom.asGeometryCollection()
             qgs_geom = max(parts, key=lambda g: g.area())
-        pts = list(qgs_geom.asPolygon()[0])
+        # The last vertex of the ring repeats the first one, so it is dropped;
+        # otherwise the two lowest points can be the same vertex and the angle
+        # comes out as 0 (fixed in 1.0.2).
+        pts = list(qgs_geom.asPolygon()[0])[:-1]
         base = sorted(pts, key=lambda p: p[1])[:2]
         if len(base) < 2:
             return 0.0
@@ -238,14 +253,17 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
         clean_geom = self._clean_geometry(qgs_geom)
         if clean_geom.isEmpty() or not clean_geom.isGeosValid():
             raise ValueError("Invalid geometry after cleaning.")
+        parts_left_out = 0
         if clean_geom.isMultipart():
-            clean_geom = max(clean_geom.asGeometryCollection(), key=lambda g: g.area())
+            parts = clean_geom.asGeometryCollection()
+            parts_left_out = len(parts) - 1
+            clean_geom = max(parts, key=lambda g: g.area())
 
         shapely_poly = wkt.loads(clean_geom.asWkt())
         angle = self._get_orientation_angle(clean_geom)
         centroid = shapely_poly.centroid
 
-        # Rotate to the base orientation, cut rows then columns, then rotate back.
+        # Normalize orientation, cut rows then columns, then rotate back.
         rotated = rotate(shapely_poly, -angle, origin=centroid)
         strips, _ = self._binary_cut(rotated, rows, axis='y', max_iter=max_iter, tol=tolerance)
         if not strips:
@@ -257,4 +275,4 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
             for p in col_pieces:
                 parcels.append(rotate(p, angle, origin=centroid))
 
-        return [QgsGeometry.fromWkt(p.wkt) for p in parcels]
+        return [QgsGeometry.fromWkt(p.wkt) for p in parcels], parts_left_out
