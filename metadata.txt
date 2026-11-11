@@ -14,18 +14,20 @@ homepage=https://github.com/roger-delgado/IsoParcel
 
 hasProcessingProvider=yes
 
-changelog=
-    1.0.2 (2026-11-11)
-        - Fixed the orientation angle: the closing vertex of the ring is no longer used to find the base segment
-        - Warning when a multipart feature is reduced to its largest part
-        - Warning when a feature produces fewer parcels than requested
-        - Help text updated to describe how multipart features are handled
-    1.0.0 (2026-08-05)
-        - Initial release
-        - Adaptive binary-search cutting algorithm
-        - Automatic topology repair (makeValid/buffer0)
-        - Processing Toolbox integration
-        - Concept initiated 2026-05-15
+   changelog=
+       1.0.2 (2026-11-11)
+           - Fixed the orientation angle: the closing vertex of the ring is no longer used to find the base segment
+           - Warning when a multipart feature is reduced to its largest part
+           - Warning when a feature produces fewer parcels than requested
+           - Help text updated to describe how multipart features are handled
+       1.0.1 (2026-05-15)
+           - Added CITATION.cff and corrected the DOI format
+       1.0.0 (2026-05-15)
+           - Initial release
+           - Adaptive binary-search cutting algorithm
+           - Automatic topology repair (makeValid/buffer0)
+           - Processing Toolbox integration
+           - Concept initiated 2026-05-15
 
 tags=subdivision,parcel,equal-area,processing,agriculture,cadastre
 

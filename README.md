@@ -40,13 +40,15 @@ Step-by-step guide with figures: [English](docs/TUTORIAL.md) · [Español](docs/
 - Area equity (CV <0.01%) applies only to successful executions; failures are logged as warnings.
 
 ## Changelog
-- **1.0.2** (2026-11-11): fixed the orientation angle (the closing vertex of the ring is no longer used to find the base segment); warnings for multipart features and for fewer parcels than requested.
-- **1.0.0** (2026-08-05): initial release.
+ - **1.0.2** (2026-11-11): fixed the orientation angle (the closing vertex of the ring is no longer used to find the base segment); warnings for multipart features and for fewer parcels than requested.
+ - **1.0.1** (2026-05-15): added CITATION.cff and corrected the DOI format.
+ - **1.0.0** (2026-05-15): initial release.
 
 ## How to cite
-Delgado-Alcívar, R. A. (2026). IsoParcel: Equal-area polygon partitioning plugin for QGIS (Version v1.0.2) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.20225169
+Delgado-Alcívar, R. A. (2026). IsoParcel: Equal-area polygon partitioning plugin for QGIS (Version v1.0.2) [Computer software]. Zenodo. https://doi.org/[DOI of v1.0.2]
 
-This DOI always resolves to the latest version. Each version has its own DOI, listed on the Zenodo record.
+## License
+GPL-2.0-or-later. See LICENSE file.
 
 ## Repository
 Source code, issue tracker, and documentation:  
