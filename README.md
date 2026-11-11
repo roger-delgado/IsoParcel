@@ -44,10 +44,9 @@ Step-by-step guide with figures: [English](docs/TUTORIAL.md) · [Español](docs/
 - **1.0.0** (2026-08-05): initial release.
 
 ## How to cite
-Delgado-Alcívar, R. A. (2026). IsoParcel: Equal-area polygon partitioning plugin for QGIS (Version v1.0.2) [Computer software]. Zenodo. https://doi.org/[DOI of v1.0.2]
+Delgado-Alcívar, R. A. (2026). IsoParcel: Equal-area polygon partitioning plugin for QGIS (Version v1.0.2) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.20225169
 
-## License
-GPL-2.0-or-later. See LICENSE file.
+This DOI always resolves to the latest version. Each version has its own DOI, listed on the Zenodo record.
 
 ## Repository
 Source code, issue tracker, and documentation:  
