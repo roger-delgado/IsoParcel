@@ -12,9 +12,10 @@ authors:
     affiliation: "Universidad Técnica de Manabí, Ecuador"
     country: "EC"
 
-version: 1.0.2
+version: 1.0.3
 doi: "10.5281/zenodo.20225169"
-date-released: 2026-11-11
+date-released: 2026-11-13
+url: "https://github.com/roger-delgado/IsoParcel/tree/v1.0.3"
 
 url: "https://github.com/roger-delgado/IsoParcel/tree/v1.0.2"
 repository-code: "https://github.com/roger-delgado/IsoParcel"
