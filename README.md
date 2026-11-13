@@ -40,6 +40,7 @@ Step-by-step guide with figures: [English](docs/TUTORIAL.md) · [Español](docs/
 - Area equity (CV <0.01%) applies only to successful executions; failures are logged as warnings.
 
 ## Changelog
+ - **1.0.3** (2026-11-13): fixed the cut position of the binary search (the converged position is now used instead of the last upper bound), so parcel areas are more equal and more subdivisions meet the 0.01% criterion.
  - **1.0.2** (2026-11-11): fixed the orientation angle (the closing vertex of the ring is no longer used to find the base segment); warnings for multipart features and for fewer parcels than requested.
  - **1.0.1** (2026-05-15): added CITATION.cff and corrected the DOI format.
  - **1.0.0** (2026-05-15): initial release.

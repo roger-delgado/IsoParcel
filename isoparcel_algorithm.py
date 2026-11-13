@@ -223,7 +223,10 @@ class IsoParcelAlgorithm(QgsProcessingAlgorithm):
                     low = mid
                 else:
                     high = mid
-                    bc = mid
+                # Keep the last position evaluated: when the search converges it
+                # is the one that meets the tolerance. Up to 1.0.2 only the upper
+                # bound was kept, so a cut reached from below was slightly off.
+                bc = mid
                 if abs(inter.area - target) / max(target, 1e-9) < 1e-6:
                     break
             cuts.append(bc)
